@@ -23,11 +23,11 @@ services:
         value: "https://chowdhury-family-frontend.onrender.com" # Update this after frontend deployment
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: chowdhury-family-frontend
-    env: static
+    runtime: static
     buildCommand: "npm install && npm run build"
-    publishDir: "dist"
+    staticPublishPath: "./dist"
     region: singapore
     plan: free
     rootDir: frontend
