@@ -121,6 +121,9 @@ else:
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Disable WhiteNoise strict manifest checking (fixes DRF missing font issues)
+WHITENOISE_MANIFEST_STRICT = False
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
