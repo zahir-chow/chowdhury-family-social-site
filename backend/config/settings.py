@@ -94,7 +94,7 @@ if env("CLOUDINARY_CLOUD_NAME", default=None):
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
     CLOUDINARY_STORAGE = {
@@ -104,19 +104,19 @@ if env("CLOUDINARY_CLOUD_NAME", default=None):
     }
     # Legacy settings for compatibility with django-cloudinary-storage
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 else:
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
     # Legacy settings
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
