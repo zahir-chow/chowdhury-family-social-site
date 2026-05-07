@@ -659,10 +659,7 @@ function SettingsPanel({
             <h3>Update Profile</h3>
             <form
               className="settings-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                onUpdateMe();
-              }}
+              onSubmit={onUpdateMe}
             >
               <label>
                 <span>Display Name</span>
