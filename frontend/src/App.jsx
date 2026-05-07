@@ -1440,15 +1440,6 @@ function App() {
         </main>
 
         <aside className="sidebar-right">
-          <div className="card stats-sidebar-card">
-            <h3>Family Overview</h3>
-            <div className="sidebar-stats-grid">
-              <div className="sidebar-stat full">
-                <strong>{directory.length}</strong>
-                <span>Total Family Members</span>
-              </div>
-            </div>
-          </div>
           <div className="card suggested-members-card">
             <h3>New Members</h3>
             <div className="suggested-list">
