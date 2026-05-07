@@ -629,72 +629,40 @@ function ProfilePanel({
         )}
       </div>
 
-      <div className="profile-grid-layout">
-        <div className="profile-sidebar-col">
-          <div className="card relationship-card">
-            <div className="section-title-row">
-              <h2>Family Circle</h2>
-            </div>
-            {relationships.length ? (
-              <div className="relationship-grid">
-                {relationships.map((relationship) => (
-                  <div className="relationship-item-card" key={relationship.id}>
-                    <div className="avatar-circle small">
-                      {relationship.related_user.avatar ? (
-                        <img src={resolveBackendUrl(relationship.related_user.avatar)} alt="Avatar" />
-                      ) : (
-                        relationship.related_user.display_name[0]
-                      )}
-                    </div>
-                    <div className="rel-details">
-                      <strong onClick={() => onSelectProfile(relationship.related_user.id)} className="clickable-name">
-                        {relationship.related_user.display_name}
-                      </strong>
-                      <p className="rel-type-tag">{relationship.relation_type}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <p className="muted">No family relationships added yet.</p>
-              </div>
-            )}
-          </div>
+      <div className="profile-posts-container">
+        <div className="section-title-row">
+          <h3>Posts by {selectedProfile?.display_name}</h3>
         </div>
-
-        <div className="profile-posts-col">
-          <div className="section-title-row">
-            <h3>Posts by {selectedProfile?.display_name}</h3>
+        {userPostsLoading ? (
+          <div className="card"><p>Loading posts...</p></div>
+        ) : userPosts.length > 0 ? (
+          <div className="feed-posts">
+            {userPosts.map((post) => (
+              <FeedPost
+                key={post.id}
+                post={post}
+                me={me}
+                comments={commentsByPost[post.id]}
+                openComments={openComments[post.id]}
+                commentsLoading={commentsLoading[post.id]}
+                commentDrafts={commentDrafts}
+                onToggleComments={onToggleComments}
+                onCommentDraftChange={onCommentDraftChange}
+                onAddComment={onAddComment}
+                onDeleteComment={onDeleteComment}
+                onDeletePost={onDeletePost}
+                onEditPost={onEditPost}
+                onReact={onReact}
+                onRemoveReaction={onRemoveReaction}
+                onViewProfile={onSelectProfile}
+              />
+            ))}
           </div>
-          {userPostsLoading ? (
-            <div className="card"><p>Loading posts...</p></div>
-          ) : userPosts.length > 0 ? (
-            <div className="feed-posts">
-              {userPosts.map((post) => (
-                <FeedPost
-                  key={post.id}
-                  post={post}
-                  me={me}
-                  comments={commentsByPost[post.id]}
-                  openComments={openComments[post.id]}
-                  commentsLoading={commentsLoading[post.id]}
-                  commentDrafts={commentDrafts}
-                  onToggleComments={onToggleComments}
-                  onCommentDraftChange={onCommentDraftChange}
-                  onAddComment={onAddComment}
-                  onDeleteComment={onDeleteComment}
-                  onDeletePost={onDeletePost}
-                  onEditPost={onEditPost}
-                  onReact={onReact}
-                  onRemoveReaction={onRemoveReaction}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="card"><p className="muted">No posts yet.</p></div>
-          )}
-        </div>
+        ) : (
+          <div className="card empty-state">
+            <p className="muted">No posts shared yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1323,6 +1291,34 @@ function App() {
               </button>
             ))}
           </nav>
+
+          {activeTab === "profile" && relationships.length > 0 && (
+            <div className="card relationship-sidebar-card">
+              <h3>Family Circle</h3>
+              <div className="relationship-sidebar-grid">
+                {relationships.map((relationship) => (
+                  <div 
+                    className="rel-sidebar-item" 
+                    key={relationship.id}
+                    onClick={() => refreshProfile(relationship.related_user.id)}
+                  >
+                    <div className="avatar-circle xsmall">
+                      {relationship.related_user.avatar ? (
+                        <img src={resolveBackendUrl(relationship.related_user.avatar)} alt="Avatar" />
+                      ) : (
+                        relationship.related_user.display_name[0]
+                      )}
+                    </div>
+                    <div className="rel-sidebar-info">
+                      <strong>{relationship.related_user.display_name}</strong>
+                      <span className="rel-tag-mini">{relationship.relation_type}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="sidebar-ad-card">
             <h4>Family Heritage</h4>
             <p>Explore your family tree and preserve your legacy for future generations.</p>

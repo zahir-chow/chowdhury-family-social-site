@@ -1439,42 +1439,88 @@ body {
 
 /* Profile Mode Layout adjustments */
 .app-shell.profile-mode {
-  grid-template-columns: 260px 1fr; /* Hide space for right sidebar */
+  grid-template-columns: 260px minmax(0, 1fr) 320px; /* Keep right sidebar space but hide it if you want, or just keep it and let it be empty */
 }
 
+/* Let's actually keep the 3-col structure but the middle will be the main profile */
 .app-shell.profile-mode .sidebar-right {
-  display: none;
+  display: block; /* Show right sidebar again but maybe we can put other info there */
 }
 
-.profile-layout {
-  max-width: 1100px;
-  margin: 0 auto;
+.relationship-sidebar-card {
+  margin-top: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 16px !important;
+}
+
+.relationship-sidebar-card h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.relationship-sidebar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rel-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.rel-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rel-sidebar-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.rel-sidebar-info strong {
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.rel-tag-mini {
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.avatar-circle.xsmall {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+/* Profile Posts Center */
+.profile-posts-container {
+  max-width: 800px;
+  margin: 32px auto 0;
   width: 100%;
 }
 
-/* Profile Grid */
-.profile-grid-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 24px;
-  margin-top: 24px;
-  align-items: start;
-}
-
-.profile-sidebar-col {
-  position: sticky;
-  top: 88px;
-}
-
-.profile-header-card {
-  border: none;
-  background: var(--card-bg);
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-  padding-bottom: 32px;
+.profile-posts-container h3 {
   margin-bottom: 24px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
+
 
 .profile-cover {
   height: 180px;
