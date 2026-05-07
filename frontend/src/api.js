@@ -130,6 +130,14 @@ export async function deletePost(postId) {
   });
 }
 
+export async function updatePost(postId, formData) {
+  return request(`/social/posts/${postId}/`, {
+    method: "PATCH",
+    body: formData,
+    headers: {},
+  });
+}
+
 export async function fetchComments(postId, page = 1) {
   return request(`/social/posts/${postId}/comments/?page=${page}`);
 }

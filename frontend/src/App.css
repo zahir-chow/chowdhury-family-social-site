@@ -277,6 +277,66 @@ body {
   word-break: break-word;
 }
 
+.post-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.icon-button:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.icon-button.danger:hover {
+  background: rgba(255, 60, 60, 0.15);
+}
+
+.post-edit-form {
+  padding: 0 20px 20px;
+}
+
+.post-edit-form textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 14px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 15px;
+  resize: vertical;
+  min-height: 80px;
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.post-edit-form textarea:focus {
+  outline: none;
+}
+
+.post-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.primary-button.small,
+.ghost-button.small {
+  padding: 8px 18px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
 .post-stats-row {
   display: flex;
   justify-content: space-between;

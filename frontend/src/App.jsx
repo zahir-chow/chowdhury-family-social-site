@@ -11,6 +11,7 @@ import {
   deleteComment,
   deletePost,
   deleteRelationship,
+  updatePost,
   fetchComments,
   fetchDirectory,
   fetchFeed,
@@ -352,10 +353,14 @@ function FeedPost({
   onAddComment,
   onDeleteComment,
   onDeletePost,
+  onEditPost,
   onReact,
   onRemoveReaction,
 }) {
   const [showReactions, setShowReactions] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editBody, setEditBody] = useState(post.body);
+  const [editPending, setEditPending] = useState(false);
   const closeTimeout = useRef(null);
 
   function handleMouseEnter() {
@@ -369,6 +374,18 @@ function FeedPost({
     closeTimeout.current = setTimeout(() => {
       setShowReactions(false);
     }, 300); // 300ms delay for stability
+  }
+
+  async function handleSaveEdit() {
+    try {
+      setEditPending(true);
+      await onEditPost(post.id, editBody);
+      setIsEditing(false);
+    } catch (err) {
+      // error handled by parent
+    } finally {
+      setEditPending(false);
+    }
   }
 
   const topReactions = useMemo(() => {
@@ -405,13 +422,37 @@ function FeedPost({
           </div>
         </div>
         {post.author.id === me?.id ? (
-          <button className="icon-button danger" onClick={() => onDeletePost(post.id)} title="Delete post">
-            🗑️
-          </button>
+          <div className="post-header-actions">
+            <button className="icon-button" onClick={() => { setIsEditing(!isEditing); setEditBody(post.body); }} title="Edit post">
+              ✏️
+            </button>
+            <button className="icon-button danger" onClick={() => onDeletePost(post.id)} title="Delete post">
+              🗑️
+            </button>
+          </div>
         ) : null}
       </div>
 
-      <div className="post-body">{post.body}</div>
+      {isEditing ? (
+        <div className="post-edit-form">
+          <textarea
+            value={editBody}
+            onChange={(e) => setEditBody(e.target.value)}
+            rows={4}
+            autoFocus
+          />
+          <div className="post-edit-actions">
+            <button className="primary-button small" onClick={handleSaveEdit} disabled={editPending}>
+              {editPending ? "Saving..." : "Save"}
+            </button>
+            <button className="ghost-button small" onClick={() => setIsEditing(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="post-body">{post.body}</div>
+      )}
 
       {post.images.length > 0 && (
         <div className="post-images-grid">
@@ -1012,6 +1053,14 @@ function App() {
     }
   }
 
+  async function handleEditPost(postId, body) {
+    const formData = new FormData();
+    formData.append("body", body);
+    await updatePost(postId, formData);
+    const feedData = await fetchFeed();
+    setFeed(feedData.results || []);
+  }
+
   async function handleReact(postId, reactionType) {
     try {
       await reactToPost(postId, reactionType);
@@ -1222,6 +1271,7 @@ function App() {
                     onAddComment={handleAddComment}
                     onDeleteComment={handleDeleteComment}
                     onDeletePost={handleDeletePost}
+                    onEditPost={handleEditPost}
                     onReact={handleReact}
                     onRemoveReaction={handleRemoveReaction}
                   />
