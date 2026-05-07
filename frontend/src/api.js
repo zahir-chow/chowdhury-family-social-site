@@ -116,6 +116,10 @@ export async function fetchFeed(page = 1) {
   return request(`/social/posts/?page=${page}`);
 }
 
+export async function fetchUserPosts(userId, page = 1) {
+  return request(`/social/posts/user/${userId}/?page=${page}`);
+}
+
 export async function createPost(formData) {
   return request("/social/posts/", {
     method: "POST",

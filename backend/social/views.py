@@ -66,6 +66,29 @@ def posts(request):
     return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_posts(request, user_id):
+    """Return all posts by a specific user, latest first."""
+    get_object_or_404(User, id=user_id, is_active=True)
+    queryset = (
+        Post.objects.filter(author_id=user_id, is_deleted=False)
+        .select_related("author")
+        .prefetch_related("images")
+        .annotate(
+            comment_count=Count("comments", filter=Q(comments__is_deleted=False), distinct=True),
+            reaction_count=Count("reactions", distinct=True),
+        )
+        .order_by("-created_at")
+    )
+    paginator = PageNumberPagination()
+    page = paginator.paginate_queryset(queryset, request)
+    serializer = PostSerializer(page if page is not None else queryset, many=True, context={"request": request})
+    if page is not None:
+        return paginator.get_paginated_response(serializer.data)
+    return Response(serializer.data)
+
+
 @api_view(["PATCH", "DELETE"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])

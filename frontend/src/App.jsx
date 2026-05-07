@@ -29,6 +29,7 @@ import {
   updateMe,
   updateRelationship,
   changePassword,
+  fetchUserPosts,
 } from "./api";
 
 const RELATIONSHIP_OPTIONS = [
@@ -576,7 +577,26 @@ function DirectoryMember({ member, me, onViewProfile }) {
   );
 }
 
-function ProfilePanel({ selectedProfile, relationships, onSelectProfile, me }) {
+function ProfilePanel({ 
+  selectedProfile, 
+  relationships, 
+  onSelectProfile, 
+  me,
+  userPosts,
+  userPostsLoading,
+  commentsByPost,
+  openComments,
+  commentsLoading,
+  commentDrafts,
+  onToggleComments,
+  onCommentDraftChange,
+  onAddComment,
+  onDeleteComment,
+  onDeletePost,
+  onEditPost,
+  onReact,
+  onRemoveReaction,
+}) {
   return (
     <div className="profile-layout">
       <div className="card profile-header-card">
@@ -608,35 +628,72 @@ function ProfilePanel({ selectedProfile, relationships, onSelectProfile, me }) {
         )}
       </div>
 
-      <div className="card relationship-card">
-        <div className="section-title-row">
-          <h2>Family Circle</h2>
-        </div>
-        {relationships.length ? (
-          <div className="relationship-grid">
-            {relationships.map((relationship) => (
-              <div className="relationship-item-card" key={relationship.id}>
-                <div className="avatar-circle small">
-                  {relationship.related_user.avatar ? (
-                    <img src={resolveBackendUrl(relationship.related_user.avatar)} alt="Avatar" />
-                  ) : (
-                    relationship.related_user.display_name[0]
-                  )}
-                </div>
-                <div className="rel-details">
-                  <strong onClick={() => onSelectProfile(relationship.related_user.id)} className="clickable-name">
-                    {relationship.related_user.display_name}
-                  </strong>
-                  <p className="rel-type-tag">{relationship.relation_type}</p>
-                </div>
+      <div className="profile-grid-layout">
+        <div className="profile-sidebar-col">
+          <div className="card relationship-card">
+            <div className="section-title-row">
+              <h2>Family Circle</h2>
+            </div>
+            {relationships.length ? (
+              <div className="relationship-grid">
+                {relationships.map((relationship) => (
+                  <div className="relationship-item-card" key={relationship.id}>
+                    <div className="avatar-circle small">
+                      {relationship.related_user.avatar ? (
+                        <img src={resolveBackendUrl(relationship.related_user.avatar)} alt="Avatar" />
+                      ) : (
+                        relationship.related_user.display_name[0]
+                      )}
+                    </div>
+                    <div className="rel-details">
+                      <strong onClick={() => onSelectProfile(relationship.related_user.id)} className="clickable-name">
+                        {relationship.related_user.display_name}
+                      </strong>
+                      <p className="rel-type-tag">{relationship.relation_type}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="empty-state">
+                <p className="muted">No family relationships added yet.</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="empty-state">
-            <p className="muted">No family relationships added yet.</p>
+        </div>
+
+        <div className="profile-posts-col">
+          <div className="section-title-row">
+            <h3>Posts by {selectedProfile?.display_name}</h3>
           </div>
-        )}
+          {userPostsLoading ? (
+            <div className="card"><p>Loading posts...</p></div>
+          ) : userPosts.length > 0 ? (
+            <div className="feed-posts">
+              {userPosts.map((post) => (
+                <FeedPost
+                  key={post.id}
+                  post={post}
+                  me={me}
+                  comments={commentsByPost[post.id]}
+                  openComments={openComments[post.id]}
+                  commentsLoading={commentsLoading[post.id]}
+                  commentDrafts={commentDrafts}
+                  onToggleComments={onToggleComments}
+                  onCommentDraftChange={onCommentDraftChange}
+                  onAddComment={onAddComment}
+                  onDeleteComment={onDeleteComment}
+                  onDeletePost={onDeletePost}
+                  onEditPost={onEditPost}
+                  onReact={onReact}
+                  onRemoveReaction={onRemoveReaction}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="card"><p className="muted">No posts yet.</p></div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -880,6 +937,9 @@ function App() {
   const [commentDrafts, setCommentDrafts] = useState({});
   const [profileEdit, setProfileEdit] = useState({ display_name: "", bio: "", avatar: null });
   const [searchQuery, setSearchQuery] = useState("");
+  const [userPosts, setUserPosts] = useState([]);
+  const [userPostsLoading, setUserPostsLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = useMemo(() => {
     if (me?.is_moderator) {
@@ -970,11 +1030,25 @@ function App() {
   }
 
   async function refreshProfile(userId) {
-    const profile = userId === me.id ? me : await fetchUser(userId);
-    setSelectedProfile(profile);
-    const relationshipData = await fetchRelationships(userId);
-    setRelationships(relationshipData.results || relationshipData);
-    setActiveTab("profile");
+    try {
+      setUserPostsLoading(true);
+      const profile = userId === me.id ? me : await fetchUser(userId);
+      setSelectedProfile(profile);
+      
+      const [relationshipData, userPostsData] = await Promise.all([
+        fetchRelationships(userId),
+        fetchUserPosts(userId)
+      ]);
+      
+      setRelationships(relationshipData.results || relationshipData);
+      setUserPosts(userPostsData.results || []);
+      setActiveTab("profile");
+      setMobileMenuOpen(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUserPostsLoading(false);
+    }
   }
 
   async function handleCreatePost(body, files) {
@@ -1179,7 +1253,10 @@ function App() {
       <header className="top-nav">
         <div className="nav-content">
           <div className="nav-left">
-            <button className="nav-home-btn" onClick={() => { setActiveTab("feed"); setSearchQuery(""); }} title="Home Feed">
+            <button className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? "✕" : "☰"}
+            </button>
+            <button className="nav-home-btn" onClick={() => { setActiveTab("feed"); setSearchQuery(""); setMobileMenuOpen(false); }} title="Home Feed">
               🏠
             </button>
             <div className="search-bar">
@@ -1202,6 +1279,7 @@ function App() {
               onClick={() => {
                 setSelectedProfile(me);
                 setActiveTab("profile");
+                setMobileMenuOpen(false);
               }}
             >
               <div className="avatar-circle small">
@@ -1213,7 +1291,7 @@ function App() {
               </div>
               <span>{me?.display_name}</span>
             </div>
-            <button className="settings-button-top" onClick={() => setActiveTab("settings")} title="Settings">
+            <button className="settings-button-top" onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} title="Settings">
               ⚙️
             </button>
             <button className="icon-button logout-icon" onClick={handleLogout} title="Logout">
@@ -1224,13 +1302,16 @@ function App() {
       </header>
 
       <div className="app-shell">
-        <aside className="sidebar-left">
+        <aside className={`sidebar-left ${mobileMenuOpen ? "mobile-open" : ""}`}>
+          <div className="sidebar-close-row">
+            <button onClick={() => setMobileMenuOpen(false)}>✕ Close Menu</button>
+          </div>
           <nav className="side-nav">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 className={item.id === activeTab ? "nav-item active" : "nav-item"}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
               >
                 <span className="nav-label">{item.label}</span>
               </button>
@@ -1328,6 +1409,22 @@ function App() {
                 relationships={relationships}
                 onSelectProfile={refreshProfile}
                 me={me}
+                userPosts={userPosts}
+                userPostsLoading={userPostsLoading}
+                commentsByPost={commentsByPost}
+                openComments={openComments}
+                commentsLoading={commentsLoading}
+                commentDrafts={commentDrafts}
+                onToggleComments={toggleComments}
+                onCommentDraftChange={(postId, value) =>
+                  setCommentDrafts((current) => ({ ...current, [postId]: value }))
+                }
+                onAddComment={handleAddComment}
+                onDeleteComment={handleDeleteComment}
+                onDeletePost={handleDeletePost}
+                onEditPost={handleEditPost}
+                onReact={handleReact}
+                onRemoveReaction={handleRemoveReaction}
               />
             </div>
           ) : null}
