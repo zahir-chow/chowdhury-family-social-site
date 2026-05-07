@@ -250,10 +250,22 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.avatar-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.avatar-circle.clickable {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.avatar-circle.clickable:hover {
+  transform: scale(1.05);
+}
+
+.author-name.clickable {
+  cursor: pointer;
+}
+
+.author-name.clickable:hover {
+  text-decoration: underline;
+  color: var(--accent);
 }
 
 .avatar-circle.small {
@@ -1512,12 +1524,21 @@ body {
   gap: 24px;
 }
 
+.profile-posts-col .empty-state {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
 .profile-posts-col h3 {
-  margin-bottom: 16px;
-  font-size: 20px;
+  margin-bottom: 0;
+  font-size: 18px;
+  font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 /* Fix post images in profile */

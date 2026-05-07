@@ -357,6 +357,7 @@ function FeedPost({
   onEditPost,
   onReact,
   onRemoveReaction,
+  onViewProfile,
 }) {
   const [showReactions, setShowReactions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -410,7 +411,7 @@ function FeedPost({
     <div className="card post-card">
       <div className="post-header">
         <div className="user-info-row">
-          <div className="avatar-circle">
+          <div className="avatar-circle clickable" onClick={() => onViewProfile(post.author.id)}>
             {post.author.avatar ? (
               <img src={resolveBackendUrl(post.author.avatar)} alt="Avatar" />
             ) : (
@@ -418,7 +419,7 @@ function FeedPost({
             )}
           </div>
           <div>
-            <strong className="author-name">{post.author.display_name}</strong>
+            <strong className="author-name clickable" onClick={() => onViewProfile(post.author.id)}>{post.author.display_name}</strong>
             <p className="muted small">{formatDate(post.created_at)}</p>
           </div>
         </div>
@@ -602,7 +603,6 @@ function ProfilePanel({
       <div className="card profile-header-card">
         <div className="profile-cover"></div>
         <div className="section-title-row">
-          <h2>{selectedProfile?.id === me?.id ? "My profile" : "Family Member"}</h2>
           {selectedProfile?.id !== me?.id ? (
             <button className="ghost-button" onClick={() => onSelectProfile(me?.id)}>
               Back to my profile
@@ -1278,9 +1278,7 @@ function App() {
             <div 
               className="nav-profile-pill" 
               onClick={() => {
-                setSelectedProfile(me);
-                setActiveTab("profile");
-                setMobileMenuOpen(false);
+                refreshProfile(me?.id);
               }}
             >
               <div className="avatar-circle small">
@@ -1312,7 +1310,14 @@ function App() {
               <button
                 key={item.id}
                 className={item.id === activeTab ? "nav-item active" : "nav-item"}
-                onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
+                onClick={() => { 
+                  if (item.id === "profile") {
+                    refreshProfile(me?.id);
+                  } else {
+                    setActiveTab(item.id); 
+                  }
+                  setMobileMenuOpen(false); 
+                }}
               >
                 <span className="nav-label">{item.label}</span>
               </button>
@@ -1356,6 +1361,7 @@ function App() {
                     onEditPost={handleEditPost}
                     onReact={handleReact}
                     onRemoveReaction={handleRemoveReaction}
+                    onViewProfile={refreshProfile}
                   />
                 ))}
               </div>
@@ -1426,6 +1432,7 @@ function App() {
                 onEditPost={handleEditPost}
                 onReact={handleReact}
                 onRemoveReaction={handleRemoveReaction}
+                onViewProfile={refreshProfile}
               />
             </div>
           ) : null}
