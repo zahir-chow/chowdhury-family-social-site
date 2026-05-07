@@ -1521,6 +1521,42 @@ body {
   letter-spacing: 2px;
 }
 
+.profile-header-card {
+  border: none;
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  padding-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+.avatar-circle.large {
+  width: 150px;
+  height: 150px;
+  border: 6px solid var(--card-bg);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  margin-top: -50px;
+  position: relative;
+  z-index: 2;
+}
+
+.profile-info-main {
+  padding-bottom: 10px;
+}
+
+.profile-info-main h3 {
+  font-size: 36px;
+  margin-bottom: 4px;
+}
+
+.bio-text {
+  max-width: 600px;
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 
 .profile-cover {
   height: 180px;
