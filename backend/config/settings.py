@@ -102,6 +102,9 @@ if env("CLOUDINARY_CLOUD_NAME", default=None):
         "API_KEY": env("CLOUDINARY_API_KEY"),
         "API_SECRET": env("CLOUDINARY_API_SECRET"),
     }
+    # Legacy settings for compatibility with django-cloudinary-storage
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 else:
     STORAGES = {
         "default": {
@@ -111,6 +114,9 @@ else:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
+    # Legacy settings
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
