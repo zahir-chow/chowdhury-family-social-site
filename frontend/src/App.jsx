@@ -692,9 +692,9 @@ function SettingsPanel({
               </button>
             </form>
 
-            <div className="add-relationship-section" style={{ borderTop: "1px solid #eee", marginTop: "30px" }}>
+            <div className="add-relationship-section">
               <h4>Manage Family Connections</h4>
-              <div className="relationship-grid" style={{ marginBottom: "20px" }}>
+              <div className="relationship-grid">
                 {relationships.map((rel) => (
                   <div className="relationship-item-card" key={rel.id}>
                     <div className="rel-details">
