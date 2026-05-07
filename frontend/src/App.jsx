@@ -600,6 +600,7 @@ function ProfilePanel({
   return (
     <div className="profile-layout">
       <div className="card profile-header-card">
+        <div className="profile-cover"></div>
         <div className="section-title-row">
           <h2>{selectedProfile?.id === me?.id ? "My profile" : "Family Member"}</h2>
           {selectedProfile?.id !== me?.id ? (
@@ -1301,7 +1302,7 @@ function App() {
         </div>
       </header>
 
-      <div className="app-shell">
+      <div className={`app-shell ${activeTab === "profile" ? "profile-mode" : ""}`}>
         <aside className={`sidebar-left ${mobileMenuOpen ? "mobile-open" : ""}`}>
           <div className="sidebar-close-row">
             <button onClick={() => setMobileMenuOpen(false)}>✕ Close Menu</button>
